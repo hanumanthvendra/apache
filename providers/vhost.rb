@@ -7,17 +7,26 @@ action :create do
   # new_resource.document_root # /var/www/...
   # new_resource.content # 'Welcome Superlions!'
 
+  # if new_resource.document_root
+  #   document_root = new_resource.document_root
+  # else
+  #   document_root = "/var/www/#{new_resource.name}/html"
+  # end
+
+  document_root = new_resource.document_root || "/var/www/#{new_resource.name}/html"
+
+
   template new_resource.config_file do
     source "config.erb"
     variables(:port => new_resource.port,
-      :document_root => new_resource.document_root)
+      :document_root => document_root)
   end
 
-  directory new_resource.document_root do
+  directory document_root do
     recursive true
   end
 
-  file "#{new_resource.document_root}/index.html" do
+  file "#{document_root}/index.html" do
     content new_resource.content
   end
 
