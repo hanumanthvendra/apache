@@ -40,7 +40,7 @@ end
 
 apache_vhost "admin" do
   config_file "#{config_filepath}/admin.conf"
-  port 8080
+  # port 8080
   content "Welcome Admin!"
   notifies :restart, "service[apache2]"
 end
