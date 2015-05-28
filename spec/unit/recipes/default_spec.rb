@@ -22,6 +22,29 @@ RSpec.shared_examples "an apache server running an apache service" do
   it 'enables the apache service' do
    expect(chef_run).to enable_service('apache2')
   end
+
+  it 'create directory to host admin html files' do
+    expect(chef_run).to create_directory("/var/www/admin/html")
+  end
+
+  it 'create index.html file for the admins see' do
+    expect(chef_run).to create_file("/var/www/admin/html/index.html").with_content("Welcome Admin!")
+  end
+
+  it 'creates a template config at the create location' do
+    expect(chef_run).to create_template(configuration_file).with(:variables => { :port => 8080, :document_root => "/var/www/admin/html"})
+  end
+
+  it 'creates the template config with the content I expect' do
+    expect(chef_run).to render_file(configuration_file).with_content("Listen 8080")
+    expect(chef_run).to render_file(configuration_file).with_content("DocumentRoot /var/www/admin/html")
+  end
+
+  it 'template notifies the apache service when it changes' do
+    resource = chef_run.template(configuration_file)
+    expect(resource).to notify("service[apache2]").to(:restart)
+  end
+
 end
 
 describe 'apache::default' do
@@ -31,33 +54,14 @@ describe 'apache::default' do
        runner.converge(described_recipe)
      end
 
+     let(:configuration_file) { "/etc/apache2/conf.d/admin.conf" }
+
      it_should_behave_like "an apache server running an apache service"
 
      it 'creates a file with correct attributes' do
        expect(chef_run).to create_file("/var/www/index.html").with(owner: "root", group: "root", mode: "0644")
      end
 
-     it 'creates a template config at the create location' do
-       expect(chef_run).to create_template("/etc/apache2/conf.d/admin.conf")
-     end
-
-     it 'creates the template config with the content I expect' do
-       expect(chef_run).to render_file("/etc/apache2/conf.d/admin.conf").with_content("Listen 8080")
-       expect(chef_run).to render_file("/etc/apache2/conf.d/admin.conf").with_content("DocumentRoot /var/www/admin/html")
-     end
-
-     it 'template notifies the apache service when it changes' do
-       resource = chef_run.template("/etc/apache2/conf.d/admin.conf")
-       expect(resource).to notify("service[apache2]").to(:restart)
-     end
-
-     it 'create directory to host admin html files' do
-       expect(chef_run).to create_directory("/var/www/admin/html")
-     end
-
-     it 'create index.html file for the admins see' do
-       expect(chef_run).to create_file("/var/www/admin/html/index.html").with_content("Welcome Admin!")
-     end
   end
 
   context 'When all attributes are default, on ubuntu 14.04' do
@@ -65,6 +69,8 @@ describe 'apache::default' do
       runner = ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '14.04')
       runner.converge(described_recipe)
     end
+
+    let(:configuration_file) { "/etc/apache2/conf-enabled/admin.conf" }
 
     it_should_behave_like "an apache server running an apache service"
 
