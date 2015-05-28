@@ -41,7 +41,7 @@ end
 apache_vhost "admin" do
   config_file "#{config_filepath}/admin.conf"
   # port 8080
-  content "Welcome Admin!"
+  # content "Welcome Admin!"
   notifies :restart, "service[apache2]"
 end
 
@@ -49,13 +49,13 @@ apache_vhost "powerusers" do
   config_file "#{config_filepath}/powerusers.conf"
   port 8000
   notifies :restart, "service[apache2]"
-  content "Welcome Powerusers!"
+  # content "Welcome Powerusers!"
 end
 
 apache_vhost "superlions" do
   config_file "#{config_filepath}/superlions.conf"
   port 7000
   document_root "/srv/www/superlions/html"
-  content "Welcome Superlions!"
+  # content "Welcome Superlions!"
   notifies :restart, "service[apache2]"
 end

@@ -61,8 +61,7 @@ RSpec.shared_examples "an apache server running an apache service" do
     expect(chef_run).to create_apache_vhost("superlions").with({
       :config_file => super_lions_configuration_file,
       :port => 7000,
-      :document_root => "/srv/www/superlions/html",
-      :content => "Welcome Superlions!"
+      :document_root => "/srv/www/superlions/html"
       })
   end
 

@@ -14,11 +14,11 @@ action :create do
   # end
 
   document_root = new_resource.document_root || "/var/www/#{new_resource.name}/html"
-  port = new_resource.port || 8080
+  content = new_resource.content || "Welcome #{new_resource.name.capitalize}!"
 
   template new_resource.config_file do
     source "config.erb"
-    variables(:port => port,
+    variables(:port => new_resource.port,
       :document_root => document_root)
   end
 
@@ -27,7 +27,7 @@ action :create do
   end
 
   file "#{document_root}/index.html" do
-    content new_resource.content
+    content content
   end
 
 end

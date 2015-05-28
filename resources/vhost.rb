@@ -10,6 +10,6 @@ actions :create
 default_action :create
 
 attribute :config_file
-attribute :port
+attribute :port, :default => 8080
 attribute :document_root
 attribute :content
