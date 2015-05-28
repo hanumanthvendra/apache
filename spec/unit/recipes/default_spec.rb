@@ -18,21 +18,13 @@ describe 'apache::default' do
 
      let(:configuration_file) { "/etc/apache2/conf.d/admin.conf" }
      let(:power_users_configuration_file) { "/etc/apache2/conf.d/powerusers.conf" }
+     let(:super_lions_configuration_file) { "/etc/apache2/conf.d/superlions.conf" }
 
      it_should_behave_like "an apache server running an apache service"
 
      it 'creates a file with correct attributes' do
        expect(chef_run).to create_file("/var/www/index.html").with(owner: "root", group: "root", mode: "0644")
      end
-
-    it 'apache_vhost resource gets created' do
-      expect(chef_run).to create_apache_vhost("superlions").with({
-        :config_file => "/etc/apache2/conf.d/superlions.conf",
-        :port => 7000,
-        :document_root => "/var/www/superlions/html",
-        :content => "Welcome Superlions!"
-        })
-    end
 
   end
 
@@ -46,6 +38,7 @@ describe 'apache::default' do
 
     let(:configuration_file) { "/etc/apache2/conf-enabled/admin.conf" }
     let(:power_users_configuration_file) { "/etc/apache2/conf-enabled/powerusers.conf" }
+    let(:super_lions_configuration_file) { "/etc/apache2/conf-enabled/superlions.conf" }
 
     it_should_behave_like "an apache server running an apache service"
 

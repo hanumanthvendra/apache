@@ -43,50 +43,23 @@ apache_vhost "admin" do
   port 8080
   document_root "/var/www/admin/html"
   content "Welcome Admin!"
+  notifies :restart, "service[apache2]"
   action :create
 end
 
-# PowerUsers, 8000
-
-# Create a configuration Template
-# Create a Directory for our HTML
-# Create that index HTML
-
-# apache_vhost "powerusers" do
-#   config_file "powerusers.conf"
-#   port 8000
-#   document_root "/var/www/powerusers/html"
-#   content "Welcome Powerusers!"
-# end
-
-template "#{config_filepath}/powerusers.conf" do
-  source "config.erb"
-  variables(port: 8000,document_root: "/var/www/powerusers/html")
+apache_vhost "powerusers" do
+  config_file "#{config_filepath}/powerusers.conf"
+  port 8000
+  document_root "/var/www/powerusers/html"
   notifies :restart, "service[apache2]"
-end
-
-directory "/var/www/powerusers/html" do
-  recursive true
-end
-
-file "/var/www/powerusers/html/index.html" do
   content "Welcome Powerusers!"
 end
-
-  # new_resource.name # 'superlions'
-  # new_resource.config_file # 'superlions.conf'
-  # new_resource.port # 7000
-  # new_resource.document_root # /var/www/...
-  # new_resource.content # 'Welcome Superlions!'
-
-
-
-#SuperLions, 7000
 
 apache_vhost "superlions" do
   config_file "#{config_filepath}/superlions.conf"
   port 7000
   document_root "/var/www/superlions/html"
   content "Welcome Superlions!"
+  notifies :restart, "service[apache2]"
   action :create
 end

@@ -35,8 +35,9 @@ RSpec.shared_examples "an apache server running an apache service" do
     expect(chef_run).to render_file(configuration_file).with_content("DocumentRoot /var/www/admin/html")
   end
 
-  it 'template notifies the apache service when it changes' do
-    resource = chef_run.template(configuration_file)
+  it 'apache_vhost notifies the apache service when it changes' do
+    # resource = chef_run.template(configuration_file)
+    resource = chef_run.apache_vhost("admin")
     expect(resource).to notify("service[apache2]").to(:restart)
   end
 
@@ -52,9 +53,17 @@ RSpec.shared_examples "an apache server running an apache service" do
   end
 
   it 'template notifies the apache service when it changes' do
-    resource = chef_run.template(power_users_configuration_file)
+    resource = chef_run.apache_vhost("powerusers")
     expect(resource).to notify("service[apache2]").to(:restart)
   end
 
+  it 'apache_vhost resource gets created for superlions' do
+    expect(chef_run).to create_apache_vhost("superlions").with({
+      :config_file => super_lions_configuration_file,
+      :port => 7000,
+      :document_root => "/var/www/superlions/html",
+      :content => "Welcome Superlions!"
+      })
+  end
 
 end
