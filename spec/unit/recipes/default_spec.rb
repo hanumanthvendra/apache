@@ -36,7 +36,30 @@ describe 'apache::default' do
      it 'creates a file with correct attributes' do
        expect(chef_run).to create_file("/var/www/index.html").with(owner: "root", group: "root", mode: "0644")
      end
+
+     it 'creates a template config at the create location' do
+       expect(chef_run).to create_template("/etc/apache2/conf-enabled/admin.conf")
+     end
+     
+     it 'creates the template config with the content I expect' do
+       expect(chef_run).to render_file("/etc/apache2/conf-enabled/admin.conf").with_content("Listen 8080")
+       expect(chef_run).to render_file("/etc/apache2/conf-enabled/admin.conf").with_content("DocumentRoot /var/www/admin/html")
+     end
+     
+     it 'template notifies the apache service when it changes' do
+       resource = chef_run.template("/etc/apache2/conf-enabled/admin.conf")
+       expect(resource).to notify("service[apache2]").to(:restart)
+     end
+     
+     it 'create directory to host admin html files' do
+       expect(chef_run).to create_directory("/var/www/admin/html")
+     end
+
+     it 'create index.html file for the admins see' do
+       expect(chef_run).to create_file("/var/www/admin/html/index.html").with_content("Welcome Admin!")
+     end
   end
+
   context 'When all attributes are default, on ubuntu 14.04' do
     let(:chef_run) do
       runner = ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '14.04')

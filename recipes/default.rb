@@ -6,19 +6,12 @@
 
 package "apache2"
 
-#require 'pry'
-#binding.pry
+# This is the magical one liner that allows you to halt the tests and examine the recipe.
+# require 'pry' ; binding.pry
 
 index_filepath = "/var/www/html/index.html"
 
-#case node["platform_version"]
-#when "12.04"
-#  index_filepath = "/var/www/index.html"
-#when "14.04"
-#  index_filepath = "/var/www/html/index.html"
-#when
-#  index_filepath = "BLBLLLLLLLLLLLLLLLLOOWOOWW UP!"
-#end
+# Case Statment Example
 
 if node["platform_version"] == "12.04"
   index_filepath = "/var/www/index.html"
@@ -33,4 +26,25 @@ end
 
 service "apache2" do
   action [ :start, :enable ] 
+end
+
+
+directory "/var/www/admin/html" do
+  recursive true
+end
+
+config_filepath = "/etc/apache2/conf-enabled"
+
+if node["platform_version"] == "12.04"
+  config_filepath = "/etc/apache2/conf.d"
+end
+
+template "#{config_filepath}/admin.conf" do
+  source "config.erb"
+  variables(port: 8080,document_root: "/var/www/admin/html")
+  notifies :restart, "service[apache2]"
+end
+
+file "/var/www/admin/html/index.html" do
+  content "Welcome Admin!"
 end

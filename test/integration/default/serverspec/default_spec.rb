@@ -11,4 +11,8 @@ describe 'apache::default' do
   describe command("curl localhost") do
     its(:stdout) { should match /Hello, world!/ }
   end
+
+  describe command("curl localhost:8080") do
+    its(:stdout) { should match /Welcome Admin!/ }
+  end
 end
