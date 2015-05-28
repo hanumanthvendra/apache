@@ -15,4 +15,8 @@ describe 'apache::default' do
   describe command("curl localhost:8080") do
     its(:stdout) { should match /Welcome Admin!/ }
   end
+
+  describe command("ohai -d /etc/chef/ohai_plugins") do
+    its(:stdout) { should match /Loaded Modules/ }
+  end 
 end
