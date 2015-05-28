@@ -25,13 +25,9 @@ file index_filepath do
 end
 
 service "apache2" do
-  action [ :start, :enable ] 
+  action [ :start, :enable ]
 end
 
-
-directory "/var/www/admin/html" do
-  recursive true
-end
 
 config_filepath = "/etc/apache2/conf-enabled"
 
@@ -39,12 +35,58 @@ if node["platform_version"] == "12.04"
   config_filepath = "/etc/apache2/conf.d"
 end
 
-template "#{config_filepath}/admin.conf" do
+
+## Admin
+
+apache_vhost "admin" do
+  config_file "#{config_filepath}/admin.conf"
+  port 8080
+  document_root "/var/www/admin/html"
+  content "Welcome Admin!"
+  action :create
+end
+
+# PowerUsers, 8000
+
+# Create a configuration Template
+# Create a Directory for our HTML
+# Create that index HTML
+
+# apache_vhost "powerusers" do
+#   config_file "powerusers.conf"
+#   port 8000
+#   document_root "/var/www/powerusers/html"
+#   content "Welcome Powerusers!"
+# end
+
+template "#{config_filepath}/powerusers.conf" do
   source "config.erb"
-  variables(port: 8080,document_root: "/var/www/admin/html")
+  variables(port: 8000,document_root: "/var/www/powerusers/html")
   notifies :restart, "service[apache2]"
 end
 
-file "/var/www/admin/html/index.html" do
-  content "Welcome Admin!"
+directory "/var/www/powerusers/html" do
+  recursive true
+end
+
+file "/var/www/powerusers/html/index.html" do
+  content "Welcome Powerusers!"
+end
+
+  # new_resource.name # 'superlions'
+  # new_resource.config_file # 'superlions.conf'
+  # new_resource.port # 7000
+  # new_resource.document_root # /var/www/...
+  # new_resource.content # 'Welcome Superlions!'
+
+
+
+#SuperLions, 7000
+
+apache_vhost "superlions" do
+  config_file "#{config_filepath}/superlions.conf"
+  port 7000
+  document_root "/var/www/superlions/html"
+  content "Welcome Superlions!"
+  action :create
 end

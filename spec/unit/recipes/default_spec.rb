@@ -9,11 +9,15 @@ require 'spec_helper'
 describe 'apache::default' do
   context 'When all attributes are default, on ubuntu 12.04' do
      let(:chef_run) do
-       runner = ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '12.04')
+        runner = ChefSpec::ServerRunner.new(platform: 'ubuntu',
+          version: '12.04',
+          step_into: ['apache_vhost'])
+
        runner.converge(described_recipe)
      end
 
      let(:configuration_file) { "/etc/apache2/conf.d/admin.conf" }
+     let(:power_users_configuration_file) { "/etc/apache2/conf.d/powerusers.conf" }
 
      it_should_behave_like "an apache server running an apache service"
 
@@ -21,15 +25,27 @@ describe 'apache::default' do
        expect(chef_run).to create_file("/var/www/index.html").with(owner: "root", group: "root", mode: "0644")
      end
 
+    it 'apache_vhost resource gets created' do
+      expect(chef_run).to create_apache_vhost("superlions").with({
+        :config_file => "/etc/apache2/conf.d/superlions.conf",
+        :port => 7000,
+        :document_root => "/var/www/superlions/html",
+        :content => "Welcome Superlions!"
+        })
+    end
+
   end
 
   context 'When all attributes are default, on ubuntu 14.04' do
     let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '14.04')
+      runner = ChefSpec::ServerRunner.new(platform: 'ubuntu',
+        version: '14.04',
+        step_into: ['apache_vhost'])
       runner.converge(described_recipe)
     end
 
     let(:configuration_file) { "/etc/apache2/conf-enabled/admin.conf" }
+    let(:power_users_configuration_file) { "/etc/apache2/conf-enabled/powerusers.conf" }
 
     it_should_behave_like "an apache server running an apache service"
 

@@ -40,4 +40,21 @@ RSpec.shared_examples "an apache server running an apache service" do
     expect(resource).to notify("service[apache2]").to(:restart)
   end
 
+
+
+  it 'creates a template config at the create location' do
+    expect(chef_run).to create_template(power_users_configuration_file).with(:variables => { :port => 8000, :document_root => "/var/www/powerusers/html"})
+  end
+
+  it 'creates the template config with the content I expect' do
+    expect(chef_run).to render_file(power_users_configuration_file).with_content("Listen 8000")
+    expect(chef_run).to render_file(power_users_configuration_file).with_content("DocumentRoot /var/www/powerusers/html")
+  end
+
+  it 'template notifies the apache service when it changes' do
+    resource = chef_run.template(power_users_configuration_file)
+    expect(resource).to notify("service[apache2]").to(:restart)
+  end
+
+
 end
